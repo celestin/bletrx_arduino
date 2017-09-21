@@ -602,8 +602,13 @@ void BLE_TRX()
     byte tmp_cnt = txcnt+rxcnt;//�ж������շ���������
     byte len_pdu = 0;
     byte loop = 0;
+<<<<<<< HEAD
     adv_data[14]=++g_temp0;
     adv_data[15]=++g_temp1;
+=======
+    adv_data[14]=g_temp0;
+    adv_data[15]=g_temp1;
+>>>>>>> dc34334cdd5f36a702bf0a2bf21aab36f0ba601d
   //����շ�������0.���Ƴ�ѭ��
     if(tmp_cnt == 0) return;
   //���� �������
@@ -687,7 +692,7 @@ void BLE_TRX()
                 LED_RED_ON(); //debug  LED ��
                 //��ȡ�����������ݵ�����
                 BLE_Get_Pdu(rx_buf, &len_pdu);
-#if 1 //debug ��Ӧ������������
+#if 0 //debug ��Ӧ������������
                 Uart_Send_String("\r\nRX: ");
                 for(loop=0; loop<len_pdu; loop++)
                 {
@@ -913,10 +918,10 @@ void Init_System(void)
   Uart_Send_String("\r\n");
 
 
-  Uart_Send_String("    ����: ");
+  Uart_Send_String("  compile data: ");
   //C macro
   Uart_Send_String(__DATE__);
-  Uart_Send_String("         ʱ��: ");
+  Uart_Send_String("  compile time: ");
   //C macro
   Uart_Send_String(__TIME__);
   Uart_Send_String("\r\n");
@@ -928,7 +933,7 @@ void Init_System(void)
 }
 
 
-#define  Usart_BaudRate  115200UL
+#define  Usart_BaudRate  230400UL
 void Init_Uart(void)
 {
 
@@ -973,11 +978,19 @@ byte txcnt = 0;
 //RX ����������
 byte rxcnt = 0;
 
+#include<math.h>  
 
+int ThermistorPin = A7;
+const float voltagePower=4.77;
+const float Rs=100;//采样电阻为100千欧  
+const int B=3950;  
+const double T1=273.15+25;//常温  
+const double R1=100;//常温对应的阻值，注意单位是千欧
 /* Private function prototypes -----------------------------------------------*/
 
 //  Serial.begin(115200);
 void setup() {
+  
   // put your setup code here, to run once:
   //init mcu system  ��ʼ��MCU 
   Init_System();
@@ -1001,6 +1014,27 @@ void setup() {
 *******************************************************************************/
 void loop()
 {
+  //获得A0处的电压值
+  double digitalValue = 0;
+  for (byte i = 0; i < 5; i++) { digitalValue += analogRead(ThermistorPin); }
+  digitalValue = digitalValue/5;
+  
+  double voltageValue=(digitalValue/1023)*voltagePower;  
+//  Serial.print("Current voltage value=");  
+//  Serial.println(voltageValue);
+
+  //通过分压比获得热敏电阻的阻值  
+  double Rt=((voltagePower-voltageValue)*Rs)/voltageValue;  
+//  Serial.print("Current registor value=");  
+//  Serial.println(Rt);
+
+  double temp_value = ((T1*B)/(B+T1*log(Rt/R1)))-273.15;
+  //换算得到温度值  
+  Serial.print("Current temperature value=");  
+  Serial.println(temp_value);//  
+  Serial.println();  
+
+  g_temp0 = (int)temp_value/10; g_temp1 = (int)temp_value%10;
 
         //////ble rtx api
         txcnt=3; //txcnt=0 is for rx only application ���÷�������
@@ -1010,7 +1044,12 @@ void loop()
         //Serial.print("BLE trx done.\r\n");
 
         //delay to set ble tx interval  ����BLE ���䡢���ռ��
+<<<<<<< HEAD
         Delay_ms(2000);
+=======
+        Delay_ms(1000);
+>>>>>>> dc34334cdd5f36a702bf0a2bf21aab36f0ba601d
 
 }
+
 
