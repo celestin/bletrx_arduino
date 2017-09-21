@@ -12,7 +12,7 @@
 #include "Includes.h"
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
-byte g_temp0=0x11,g_temp1=0x22;
+byte g_temp0=0x11,g_temp1=0x22,cnt = 0;
 void GPIO_SetBits(byte ignore, byte pin)
 {
   digitalWrite(pin, HIGH);
@@ -232,7 +232,7 @@ unsigned char rx_buf[39]; //include header(2B)+mac(6B)+data(max31B), for rx appl
 #define LEN_DATA 30
 //�㲥�������� PDU ��ʽ��
 //byte adv_data[30] = {0x02,0x01,0x04, 0x1a,0xff,0x4c,0x00,2,0x15, 0xfd,0xa5,0x06,0x93,0xa4,0xe2,0x4f,0xb1,0xaf,0xcf,0xc6,0xeb,0x07,0x64,0x78,0x25, 0x27,0x32,0x52,0xa9, 0xB6};
-byte adv_data[30] = {0x02,0x01,0x04, 0x08,  0x09,0x57,0x44,0x42,0x51, 0x30,0x30,0x31,0x03,0x16,0x55,0xaa,0x55,0xaa,0x55,0xaa,0x55,0xaa,0x55,0xaa,0xaa, 0x55,0xaa,0x55,0xaa, 0xaa};
+byte adv_data[30] = {0x02,0x01,0x04, 0x08,  0x09,0x57,0x44,0x42,0x51, 0x30,0x30,0x31,0x05,0x16,0x55,0xaa,0x55,0xaa,0x55,0xaa,0x55,0xaa,0x55,0xaa,0xaa, 0x55,0xaa,0x55,0xaa, 0xaa};
 
 
 
@@ -602,8 +602,12 @@ void BLE_TRX()
     byte tmp_cnt = txcnt+rxcnt;//�ж������շ���������
     byte len_pdu = 0;
     byte loop = 0;
-    adv_data[14]=g_temp0;
-    adv_data[15]=g_temp1;
+//    adv_data[14]=g_temp0;
+//    adv_data[15]=g_temp1;
+    adv_data[14]=cnt++;
+    adv_data[15]=0;
+    adv_data[16]=g_temp0;
+    adv_data[17]=g_temp1;
   //����շ�������0.���Ƴ�ѭ��
     if(tmp_cnt == 0) return;
   //���� �������
@@ -928,7 +932,7 @@ void Init_System(void)
 }
 
 
-#define  Usart_BaudRate  230400UL
+#define  Usart_BaudRate  115200UL
 void Init_Uart(void)
 {
 
@@ -1023,20 +1027,22 @@ void loop()
 //  Serial.print("Current registor value=");  
 //  Serial.println(Rt);
 
-  double temp_value = ((T1*B)/(B+T1*log(Rt/R1)))-273.15;
+  double temp_value = ((T1*B)/(B+T1*log(Rt/R1)))-273.15   - 1;
   //换算得到温度值  
   Serial.print("Current temperature value=");  
   Serial.println(temp_value);//  
   Serial.println();  
 
-  g_temp0 = (int)temp_value/10; g_temp1 = (int)temp_value%10;
+  g_temp0 = (int)temp_value/10*16+(int)temp_value%10;
+  temp_value = (int)(temp_value*100) %100;
+  g_temp1 = (int)temp_value/10*16+(int)temp_value%10;
 
         //////ble rtx api
         txcnt=3; //txcnt=0 is for rx only application ���÷�������
-        rxcnt=6; //rxcnt=0 is for tx only application ���ý�������
+        rxcnt=0; //rxcnt=0 is for tx only application ���ý�������
         //����ִ��3�� ���䣬 6�� ���� �����˳�
         BLE_TRX();
-        //Serial.print("BLE trx done.\r\n");
+        Serial.print("BLE trx done.\r\n");
 
         //delay to set ble tx interval  ����BLE ���䡢���ռ��
         Delay_ms(1000);
