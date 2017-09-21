@@ -981,10 +981,10 @@ byte rxcnt = 0;
 
 int ThermistorPin = A7;
 const float voltagePower=4.77;
-const float Rs=100;//采样电阻为100千欧  
-const int B=3950;  
+const float Rs=10000;//采样电阻为10k欧
+const int B=3950;
 const double T1=273.15+25;//常温  
-const double R1=100;//常温对应的阻值，注意单位是千欧
+const double R1=10000;//常温对应的阻值，注意单位是欧
 /* Private function prototypes -----------------------------------------------*/
 
 //  Serial.begin(115200);
