@@ -1,0 +1,15 @@
+
+void GPIO_SetBits(byte ignore, byte pin)
+{
+  digitalWrite(pin, HIGH);
+}
+
+void GPIO_ResetBits(byte ignore, byte pin)
+{
+  digitalWrite(pin, LOW);
+}
+
+byte GPIO_ReadInputDataBit(byte ignore, byte pin)
+{
+  return ((digitalRead(pin) == HIGH) ? 1:0);
+}
