@@ -981,10 +981,10 @@ byte rxcnt = 0;
 
 int ThermistorPin = A7;
 const float voltagePower=4.77;
-const float Rs=10000;//采样电阻为10k欧
-const int B=3950;
+const float Rs=100;//采样电阻为100千欧  
+const int B=3950;  
 const double T1=273.15+25;//常温  
-const double R1=10000;//常温对应的阻值，注意单位是欧
+const double R1=100;//常温对应的阻值，注意单位是千欧
 /* Private function prototypes -----------------------------------------------*/
 
 //  Serial.begin(115200);
@@ -1027,7 +1027,7 @@ void loop()
 //  Serial.print("Current registor value=");  
 //  Serial.println(Rt);
 
-  double temp_value = ((T1*B)/(B+T1*log(Rt/R1)))-273.15   - 1;
+  double temp_value = ((T1*B)/(B+T1*log(Rt/R1)))-273.15   - 0.5;
   //换算得到温度值  
   Serial.print("Current temperature value=");  
   Serial.println(temp_value);//  
@@ -1045,7 +1045,7 @@ void loop()
         Serial.print("BLE trx done.\r\n");
 
         //delay to set ble tx interval  ����BLE ���䡢���ռ��
-        Delay_ms(1000);
+        Delay_ms(500);
 
 }
 
